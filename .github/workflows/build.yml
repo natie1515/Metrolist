@@ -19,13 +19,14 @@ jobs:
           distribution: temurin
           java-version: 21
 
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install NDK and CMake
+      - name: Install Android SDK Components
         run: |
-          sdkmanager "ndk;25.2.9519653"
+          yes | sdkmanager --licenses
+          sdkmanager "platform-tools"
+          sdkmanager "platforms;android-34"
+          sdkmanager "build-tools;34.0.0"
           sdkmanager "cmake;3.22.1"
+          sdkmanager "ndk;27.0.12077973"
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
@@ -34,7 +35,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build Release APK
-        run: ./gradlew assembleUniversalGmsRelease
+        run: ./gradlew assembleUniversalGmsRelease --stacktrace
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
