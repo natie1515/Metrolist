@@ -1,12 +1,7 @@
-name: Build APK
+name: Manual APK Build
 
 on:
   workflow_dispatch:
-  push:
-    branches: ["**"]
-
-permissions:
-  contents: read
 
 jobs:
   build:
@@ -21,29 +16,14 @@ jobs:
           java-version: "21"
           distribution: "temurin"
 
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-
-      - name: Grant execute permission
+      - name: Grant permission
         run: chmod +x gradlew
 
-      - name: Build Release APK
+      - name: Build APK
         run: ./gradlew assembleUniversalGmsRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: app-release
-          path: app/build/outputs/apk/universalGms/release/*.apk      - name: Build Universal Debug APK and Run Lint
-        run: ./gradlew --console=plain assembleUniversal${{ matrix.variant == 'foss' && 'Foss' || 'Gms' }}Debug :app:lintUniversal${{ matrix.variant == 'foss' && 'Foss' || 'Gms' }}Debug --warning-mode summary
-        env:
-          PULL_REQUEST: "false"
-          GITHUB_EVENT_NAME: ${{ github.event_name }}
-          LASTFM_API_KEY: ${{ secrets.LASTFM_API_KEY }}
-          LASTFM_SECRET: ${{ secrets.LASTFM_SECRET }}
-
-      - name: Upload Debug APK
-        uses: actions/upload-artifact@v6
-        with:
-          name: ${{ matrix.variant == 'gms' && 'app-universal-debug-gms' || 'app-universal-debug' }}
-          path: app/build/outputs/apk/universal${{ matrix.variant == 'foss' && 'Foss' || 'Gms' }}/debug/*.apk
+          path: app/build/outputs/apk/universalGms/release/*.apk
